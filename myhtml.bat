@@ -4,7 +4,7 @@ setlocal
 set title=unnamed
 goto :cmdline
 
-:usage
+:usage            `
 if not -%1==- echo>&2 %*
 echo>&2 usage: %~n0 [-0] [-m] [title]
 echo>&2        creates title.htm
@@ -42,7 +42,7 @@ set name=%name:#=_%
 
 rem CSS
 set cssparts=css_copy
-if not "%minimal%"=="true" set cssparts=css_doc css_grid css_sections css_listings css_refs %cssparts%
+if not "%minimal%"=="true" set cssparts=css_doc css_grid css_info css_sections css_listings css_refs %cssparts%
 
 rem JS
 set jsparts=js_top
@@ -143,9 +143,19 @@ echo:^</div^> ^<!-- my-left --^>
 echo:
 echo:^<div class="my-main"^>
 echo:
-echo:Howdy! This is a
-echo:^<a href="#myref_wiki" class="my-refs-ref"^>Wikipedia^</a^>
-echo:reference.
+echo:Dit is een
+echo:^<a href="#myref_wiki" class="my-refs-ref"^>referentie^</a^>.
+echo:^<br/^>
+echo:^<br/^>
+echo:Een ^<label for="info_1" class="jcr-info"^>info^</label^> blok
+echo:^<br/^>
+echo:dat tussen
+echo:^<input id="info_1" class="jcr-info" type="checkbox"/^>
+echo:^<div class="jcr-info"^>
+echo:^<label for="info_1" class="jcr-info"^>^</label^>
+echo:Hier kwam geen JavaScript aan te pas!
+echo:^</div^>
+echo:deze regels komt.
 echo:^<h4 class="center"^>^&#x2744;^&#x2744;^&#x2744;^</h4^>
 echo:^<h4 class="my-section" id="section_1"^>Een sectie^</h4^>
 echo:
@@ -164,7 +174,7 @@ exit /B 0
 :html_refs
 echo:
 echo:^<!-- references --^>
-echo:^<h3 class="my-section" id="section_references"^>References^</h3^>
+echo:^<h3 class="my-section" id="section_references"^>Referenties^</h3^>
 echo:^<!-- refer as:
 echo:^<a href="#ref_something" class="my-refs-ref"^>^</a^>
 echo:   references in textarea:
@@ -216,6 +226,7 @@ echo:
 echo:*
 echo:{
 echo:   box-sizing:       border-box;                 /* */
+echo:   font-family:      sans-serif;                 /* */
 echo:}
 echo:
 echo:body
@@ -303,7 +314,83 @@ echo:   {
 echo:      min-width: 15vw;                           /* */
 echo:   }
 echo:}
-echo:/* end page grid style */
+echo:/*   end page grid style */
+exit /B 0
+
+:css_info
+echo:
+echo:/* begin info style */
+echo:/* usage:                                                                   */
+echo:/* ^<label for="id" class="jcr-info"^>optional text^</label^>                   */
+echo:/*    other content                                                         */
+echo:/*    other content                                                         */
+echo:/* ^<input id="id" class="jcr-info" type="checkbox"/^>               */
+echo:/* ^<div class="jcr-info"^>                                                   */
+echo:/*    other content                                                         */
+echo:/* ^<label for="id" class="jcr-info"^>optional text^</label^>                   */
+echo:/*    other content                                                         */
+echo:/* ^</div^>                                                                   */
+echo:/* the ^<div^> must be the immediate successor of the ^<input^>                 */
+echo:/* the first ^<label^> gets a small 'i'                                       */
+echo:/* the second ^<label^> puts a 'close cross' in the right top of the ^<div^>    */
+echo:/* both labels trigger an invisible checkbox on which CSS toggles the ^<div^> */
+echo:
+echo:label.jcr-info
+echo:{
+echo:   cursor:         pointer;                      /* */
+echo:}
+echo:
+echo:label.jcr-info::after
+echo:{
+echo:   content:        '\01f6c8';                    /* */
+echo:   font-weight:    bolder;                       /* */
+echo:   color:          hsl(240, 100%%, 050%%);         /* */
+echo:   vertical-align: super;                        /* */
+echo:   font-size:      smaller;                      /* */
+echo:}
+echo:
+echo:input[type="checkbox"].jcr-info
+echo:{
+echo:   width:            0;                          /* */
+echo:   height:           0;                          /* */
+echo:}
+echo:
+echo:input[type="checkbox"].jcr-info + div.jcr-info
+echo:{
+echo:   height:           0;                          /* */
+echo:   overflow:         hidden;                     /* */
+echo:   padding:          0;                          /* */
+echo:
+echo:   position:         relative;                   /* */
+echo:
+echo:   background-color: hsl(060, 100%%, 090%%);       /* */
+echo:   box-shadow:       0 0 .5rem;                  /* */
+echo:   border-radius:    5px;                        /* */
+echo:
+echo:   transform:        scale(0.0);                 /* */
+echo:   opacity:          0.0;                        /* */
+echo:   transition:       all .5s ease-in-out;        /* */
+echo:}
+echo:
+echo:input[type="checkbox"].jcr-info:checked + div.jcr-info
+echo:{
+echo:   height:           auto;                       /* */
+echo:   margin:           .5rem 1rem;                 /* */
+echo:   padding:          1rem;                       /* */
+echo:
+echo:   transform:        scale(1.0);                 /* */
+echo:   opacity:          1.0;                        /* */
+echo:   transition:       all 2s ease-in-out;         /* */
+echo:}
+echo:
+echo:div.jcr-info label.jcr-info::after
+echo:{
+echo:   content:  '\02612';                           /* */
+echo:   position: absolute;                           /* */
+echo:   top:      0;                                  /* */
+echo:   right:    .5rem;                              /* */
+echo:}
+echo:/*   end info style */
 exit /B 0
 
 :css_sections
@@ -368,7 +455,7 @@ echo:ol.my-listing.nolinenrs li
 echo:{
 echo:   border-left:     initial;                     /* */
 echo:}
-echo:/* end listings style */
+echo:/*   end listings style */
 exit /B 0
 
 :css_refs
@@ -381,6 +468,11 @@ echo:   font-size:      smaller;                      /* */
 echo:}
 echo:.my-refs-ref::before { content: '['; }           /* */
 echo:.my-refs-ref::after  { content: ']'; }           /* */
+echo:.my-refs-ref,
+echo:.my-refs-ref:visited
+echo:{
+echo:   color: hsl(000, 000%%, 050%%);                  /* */
+echo:}
 echo:
 echo:.my-refs-list ^> * { margin-top: 0; }             /* */
 echo:
@@ -426,7 +518,7 @@ echo:{
 echo:   white-space:  pre-wrap;                       /* */
 echo:   padding-left: .3rem;                          /* */
 echo:}
-echo:/* end references style */
+echo:/*   end references style */
 exit /B 0
 
 
